@@ -10,7 +10,6 @@ import log
 from constants import *
 import encode
 from send2trash import send2trash
-# import shutil
 import psutil
 from args import *
 import sys
