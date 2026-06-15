@@ -7,6 +7,7 @@ import sys
 import uuid
 from mymd5 import *
 from constants import *
+from typing import Any, Optional
 ISMAIN: bool = __name__ == "__main__"
 archive_exts = ('.zip', '.rar', '.7z', '.tar.gz', '.gz', '.bz2', '.xz')
 def confirm_pause():
@@ -233,31 +234,31 @@ def check_operation(file_list: list[str], oper_type: str) -> Result:
 def get_encode_name_map(file_list: list[str]) -> Result: 
     data, msg = get_anchor_info_for_encode_name(file_list)
     if not data: print(msg);  return data, msg
-    print(f"[Info] anchor文件名称为: {data}")
+    if ISMAIN:
+        print(f"[Info] anchor文件名称为: {data}")
     name_map, msg = process_new_name(file_list, data)
     if not name_map: print(msg);  return name_map, msg
     return name_map, ""
 
-def get_decode_name_map(file_list: list[str], tail_len: int = 3) -> Result:
-    # 测试
-    # res = encode_name(file_list)
-    # res_list = list(res.values())
-    # anchor, error = get_anchor_info_for_decode_name(res_list)
-    # success, res = recovery_name(res_list, anchor)
+def get_decode_name_map(file_list: list[str], tail_len: int = 3, name: Optional[str] = None) -> Result:
     data, msg = get_anchor_info_for_decode_name(file_list)
     if not data: print(msg);  return data, msg
     ext = ".7z"
-    ext_chose = input("分卷压缩的格式是？1.7z 2.zip 3.其他 , 请输入：").strip()
-    if ext_chose == "2":
-        ext = "zip"
-    elif ext_chose == "3":
-        ext = input("输入后缀：")
-    base_name = "compressed"
-    base_name_choice = input("\n⚠️需要自定义前缀吗？(请输入 yes 继续否则跳过): ").strip().lower()
-    if base_name_choice == "yes" or base_name_choice == "y":
-        base_name = input("输入前缀：")
+    if ISMAIN:
+        ext_chose = input("分卷压缩的格式是？1.7z 2.zip 3.其他 , 请输入：").strip()
+        if ext_chose == "2":
+            ext = "zip"
+        elif ext_chose == "3":
+            ext = input("输入后缀：")
+    base_name: str = "compressed"
+    if name: base_name = name
+    if ISMAIN:
+        base_name_choice = input("\n⚠️需要自定义前缀吗？(请输入 yes 继续否则跳过): ").strip().lower()
+        if base_name_choice == "yes" or base_name_choice == "y":
+            base_name = input("输入前缀：")
         
-    print(f"[Info] anchor文件名称为: {data}")
+    if ISMAIN:
+        print(f"[Info] anchor文件名称为: {data}")
     name_map, msg = recovery_name(file_list, data, ext, base_name, tail_len)
     if not name_map: print(msg);  return name_map, msg
     return name_map, ""
@@ -296,4 +297,4 @@ def auto_ed_code(tail_len: int) -> None:
 
 
 if ISMAIN:
-    auto_ed_code()
+    auto_ed_code(3)
